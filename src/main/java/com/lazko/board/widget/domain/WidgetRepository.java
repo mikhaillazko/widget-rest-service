@@ -12,7 +12,7 @@ public interface WidgetRepository {
     Integer getMaxZ();
     boolean isEmptyZIndex(Integer z);
     List<Widget> getTailZ(Integer z);
-    Page<Widget> findAll(Pageable pageable);
+    Page<Widget> findAll(Pageable pageable, ScreenArea screenArea);
     Widget getById(Long id) throws NotFoundEntityException;
     Widget save(Widget entity);
     Iterable<Widget> saveAll(List<Widget> entities);

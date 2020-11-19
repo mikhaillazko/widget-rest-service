@@ -1,6 +1,7 @@
 package com.lazko.board.widget.application.controller;
 
 import com.lazko.board.widget.domain.BoardService;
+import com.lazko.board.widget.domain.ScreenArea;
 import com.lazko.board.widget.domain.Widget;
 import com.lazko.board.widget.domain.WidgetRepository;
 import org.modelmapper.ModelMapper;
@@ -27,14 +28,12 @@ public class WidgetController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     public OutWidgetDTO createWidget(@Valid @RequestBody InWidgetDTO widgetDTO) {
         var widget = boardService.createWidget(widgetDTO.x, widgetDTO.y, widgetDTO.z, widgetDTO.width, widgetDTO.height);
         return convertToDto(widget);
     }
 
     @PutMapping("/{id}")
-    @ResponseBody
     public OutWidgetDTO updateWidget(@PathVariable Long id, @Valid @RequestBody InWidgetDTO widgetDTO) {
         var widget = boardService.updateWidget(id, widgetDTO.x, widgetDTO.y, widgetDTO.z, widgetDTO.width, widgetDTO.height);
         return convertToDto(widget);
@@ -47,16 +46,14 @@ public class WidgetController {
     }
 
     @GetMapping("/{id}")
-    @ResponseBody
     public OutWidgetDTO getWidgetDetail(@PathVariable Long id) {
         var widget = boardService.getWidget(id);
         return convertToDto(widget);
     }
 
     @GetMapping()
-    @ResponseBody
-    public Page<OutWidgetDTO> getWidgetList(Pageable pageable) {
-        var widgetByPage = boardService.getWidgetByPage(pageable);
+    public Page<OutWidgetDTO> getWidgetList(Pageable pageable, ScreenArea screenArea) {
+        var widgetByPage = boardService.getWidgetByPage(pageable, screenArea);
         return widgetByPage.map(this::convertToDto);
     }
 

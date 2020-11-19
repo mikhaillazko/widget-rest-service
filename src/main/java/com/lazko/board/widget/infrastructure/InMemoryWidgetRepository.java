@@ -1,5 +1,6 @@
 package com.lazko.board.widget.infrastructure;
 
+import com.lazko.board.widget.domain.ScreenArea;
 import com.lazko.board.widget.domain.Widget;
 import com.lazko.board.widget.domain.WidgetRepository;
 import com.lazko.board.widget.domain.exception.NotFoundEntityException;
@@ -16,10 +17,11 @@ import java.util.stream.Collectors;
 @Repository
 public class InMemoryWidgetRepository implements WidgetRepository {
     private final AtomicLong counter = new AtomicLong();
-    final TreeMap<Integer, Long> zIndexMap = new TreeMap<>();
+    private final TreeMap<Integer, Long> zIndexMap = new TreeMap<>();
     private final ConcurrentHashMap<Long, Widget> widgetCollection = new ConcurrentHashMap<>();
 
-    public InMemoryWidgetRepository() {}
+    public InMemoryWidgetRepository() {
+    }
 
     @Override
     public Long generateId() {
@@ -39,7 +41,19 @@ public class InMemoryWidgetRepository implements WidgetRepository {
     }
 
     @Override
-    public Page<Widget> findAll(Pageable pageable) {
+    public Page<Widget> findAll(Pageable pageable, ScreenArea screenArea) {
+        if (!screenArea.isEmpty()) {
+            // for improve performance need to try use RTree
+            var slicedWidgets = widgetCollection.values()
+                    .stream()
+                    .filter(screenArea::isIncluding)
+                    .sorted(Comparator.comparing(Widget::getZ))
+                    .skip(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .collect(Collectors.toList());
+            return new PageImpl(slicedWidgets, pageable, slicedWidgets.size());
+        }
+
         var slicedZIndex = zIndexMap
                 .values()
                 .stream()
@@ -48,9 +62,8 @@ public class InMemoryWidgetRepository implements WidgetRepository {
                 .collect(Collectors.toList());
 
         var slicedWidgets = new LinkedList<Widget>();
-        for (var widget_id: slicedZIndex)
+        for (var widget_id : slicedZIndex)
             slicedWidgets.add(widgetCollection.get(widget_id));
-
         return new PageImpl(slicedWidgets, pageable, widgetCollection.size());
     }
 
@@ -75,8 +88,9 @@ public class InMemoryWidgetRepository implements WidgetRepository {
 
     @Override
     public Widget save(Widget entity) {
-        widgetCollection.put(entity.getId(), entity);
-        zIndexMap.put(entity.getZ(), entity.getId());
+        Long entityId = entity.getId();
+        widgetCollection.put(entityId, entity);
+        zIndexMap.put(entity.getZ(), entityId);
         return entity;
     }
 
@@ -93,4 +107,5 @@ public class InMemoryWidgetRepository implements WidgetRepository {
             save(widget);
         return entities;
     }
+
 }

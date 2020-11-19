@@ -1,6 +1,7 @@
 package com.lazko.board.widget.infrastructure;
 
 import com.lazko.board.widget.domain.Widget;
+import com.lazko.board.widget.domain.WidgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -14,29 +15,29 @@ import javax.transaction.Transactional;
 public class DatabaseWidgetRepositoryTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
-    DatabaseWidgetRepository dbWidgetRepository;
+    DatabaseWidgetRepository widgetRepository;
 
     @Test
     public void testSaveNew_expectSuccessfulExecuted() {
-        var id = dbWidgetRepository.generateId();
+        var id = widgetRepository.generateId();
         var newWidget = new Widget(id,1, 1, 1, 1, 1);
         // Act
-        dbWidgetRepository.save(newWidget);
+        widgetRepository.save(newWidget);
         // Assert
-        Widget actualWidget = dbWidgetRepository.getById(id);
+        Widget actualWidget = widgetRepository.getById(id);
         Assert.assertEquals(actualWidget.getZ(), newWidget.getZ());
     }
 
     @Test
     public void testSaveExisting_expectSuccessfulExecuted() {
-        var id = dbWidgetRepository.generateId();
+        var id = widgetRepository.generateId();
         var newWidget = new Widget(id,1, 1, 1, 1, 1);
-        dbWidgetRepository.save(newWidget);
+        widgetRepository.save(newWidget);
         newWidget.setZ(2);
         // Act
-        dbWidgetRepository.save(newWidget);
+        widgetRepository.save(newWidget);
         // Assert
-        Widget actualWidget = dbWidgetRepository.getById(id);
+        Widget actualWidget = widgetRepository.getById(id);
         Assert.assertEquals(actualWidget.getZ(), newWidget.getZ());
     }
 }

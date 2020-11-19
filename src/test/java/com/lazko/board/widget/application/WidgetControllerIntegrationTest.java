@@ -330,4 +330,28 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
                 .andExpect(jsonPath("$.pageable.pageSize", is(2)))
                 .andExpect(jsonPath("$.pageable.paged", is(true)));
     }
+
+    @Test
+    public void testGetListWidgetsWithQueryArea_expectOkListOfWidgetsWith2Elements() throws Exception {
+        var widget1 = new Widget(widgetRepository.generateId(), 0, 100, 1, 100, 100);
+        widgetRepository.save(widget1);
+        var widget2 = new Widget(widgetRepository.generateId(), 0, 150, 2, 100, 100);
+        widgetRepository.save(widget2);
+        var widget3 = new Widget(widgetRepository.generateId(), 50, 150, 3, 100, 100);
+        widgetRepository.save(widget2);
+        // Act
+        var response = mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT_URI + "?x=0&y=150&width=100&height=150"));
+        // Assert
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id", is(widget1.getId().intValue())))
+                .andExpect(jsonPath("$.content[1].id", is(widget2.getId().intValue())))
+                .andExpect(jsonPath("$.totalPages", is(1)))
+                .andExpect(jsonPath("$.totalElements", is(2)))
+                .andExpect(jsonPath("$.pageable.pageNumber", is(0)))
+                .andExpect(jsonPath("$.pageable.offset", is(0)))
+                .andExpect(jsonPath("$.pageable.pageSize", is(10)))
+                .andExpect(jsonPath("$.pageable.paged", is(true)));
+    }
 }

@@ -1,5 +1,6 @@
 package com.lazko.board.widget.infrastructure;
 
+import com.lazko.board.widget.domain.ScreenArea;
 import com.lazko.board.widget.domain.Widget;
 import com.lazko.board.widget.domain.WidgetRepository;
 import com.lazko.board.widget.domain.exception.NotFoundEntityException;
@@ -35,14 +36,14 @@ public class DatabaseWidgetRepository implements WidgetRepository {
 
     @Override
     public Integer getMaxZ() {
-        Query nativeQuery = entityManager.createNativeQuery("SELECT MAX(w.z) from WIDGETS w");
+        Query nativeQuery = entityManager.createNativeQuery("SELECT MAX(w.z) from widgets w");
         Object maxZ = nativeQuery.getSingleResult();
         return maxZ == null ? 0: (Integer) maxZ;
     }
 
     @Override
     public boolean isEmptyZIndex(Integer z) {
-        Query nativeQuery = entityManager.createNativeQuery("SELECT count(w.z) from WIDGETS w WHERE w.z = ?")
+        Query nativeQuery = entityManager.createNativeQuery("SELECT count(w.z) from widgets w WHERE w.z = ?")
                 .setParameter(1, z);
         var count = (BigInteger) nativeQuery.getSingleResult();
         long l = count.longValue();
@@ -52,29 +53,46 @@ public class DatabaseWidgetRepository implements WidgetRepository {
     @Override
     public List<Widget> getTailZ(Integer z) {
         Query query = entityManager.createNativeQuery(
-            "SELECT w.ID, w.X, w.Y, w.Z, w.WIDTH, w.HEIGHT, w.UPDATEDAT FROM WIDGETS w WHERE w.Z >= ? ", Widget.class
+            "SELECT w.id, w.x, w.y, w.z, w.width, w.height, w.updatedat FROM widgets w WHERE w.Z >= ? ", Widget.class
         ).setParameter(1, z);
         return query.getResultList();
     }
 
     @Override
-    public Page<Widget> findAll(Pageable pageable) {
+    public Page<Widget> findAll(Pageable pageable, ScreenArea screenArea) {
+        Query countQuery = entityManager.createNativeQuery("SELECT count(*) FROM widgets");
+        var countValue = (BigInteger) countQuery.getSingleResult();
+
+        if (!screenArea.isEmpty()){
+            Query query = entityManager.createNativeQuery(
+                "SELECT w.id, w.x, w.y, w.z, w.width, w.height, w.updatedat " +
+                        "FROM widgets w " +
+                        "WHERE w.x >= :x0 AND w.y <= :y0 AND w.x + w.width <= :x1 AND w.y + w.height <= :y1 " +
+                        "ORDER BY w.z ASC LIMIT :lim OFFSET :off", Widget.class
+            ).setParameter("x0", screenArea.x)
+                    .setParameter("y0", screenArea.y)
+                    .setParameter("x1", screenArea.x + screenArea.width)
+                    .setParameter("y1", screenArea.y + screenArea.height)
+                    .setParameter("lim", pageable.getPageSize())
+                    .setParameter("off", pageable.getOffset());
+            List<Widget> resultList = query.getResultList();
+            return new PageImpl(resultList, pageable, countValue.longValue());
+        }
+
         Query query = entityManager.createNativeQuery(
-            "SELECT w.ID, w.X, w.Y, w.Z, w.WIDTH, w.HEIGHT, w.UPDATEDAT " +
-               "FROM WIDGETS w ORDER BY w.Z ASC LIMIT ? OFFSET ?", Widget.class
+            "SELECT w.id, w.x, w.y, w.z, w.width, w.height, w.updatedat " +
+               "FROM widgets w ORDER BY w.z ASC LIMIT ? OFFSET ?", Widget.class
         ).setParameter(1, pageable.getPageSize())
                 .setParameter(2, pageable.getOffset());
 
-        Query countQuery = entityManager.createNativeQuery("SELECT count(*) FROM WIDGETS");
         List<Widget> resultList = query.getResultList();
-        var countValue = (BigInteger) countQuery.getSingleResult();
         return new PageImpl(resultList, pageable, countValue.longValue());
     }
 
     @Override
     public Widget getById(Long id) throws NotFoundEntityException {
         Query query = entityManager.createNativeQuery(
-            "SELECT w.ID, w.X, w.Y, w.Z, w.WIDTH, w.HEIGHT, w.UPDATEDAT FROM widgets w WHERE w.id = ?", Widget.class
+            "SELECT w.id, w.x, w.y, w.z, w.width, w.height, w.updatedat FROM widgets w WHERE w.id = ?", Widget.class
         ).setParameter(1, id);
         var widgets = query.getResultList();
         if (widgets.isEmpty())

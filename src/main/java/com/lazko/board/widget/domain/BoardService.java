@@ -75,10 +75,10 @@ public class BoardService {
         }
     }
 
-    public Page<Widget> getWidgetByPage(Pageable pageable) {
+    public Page<Widget> getWidgetByPage(Pageable pageable, ScreenArea screenArea) {
         rwl.readLock().lock();
         try{
-            return widgetRepository.findAll(pageable);
+            return widgetRepository.findAll(pageable, screenArea);
         } finally {
             rwl.readLock().unlock();
         }

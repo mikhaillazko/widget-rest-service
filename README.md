@@ -29,4 +29,4 @@ There are two implementation of WidgetRepository
 
 _Error Statuses_: 400, 404
 
-It's result of my express course Java and Spring. Feel free create issues)
+It's the result of my express course Java and Spring. Feel free to create issues)
