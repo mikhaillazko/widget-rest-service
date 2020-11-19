@@ -10,7 +10,7 @@ public class WidgetTest {
 
     @Test
     public void testGetHashCode() {
-        var widget = new Widget(1L, new WidgetInfo(1, 1, 1, 1, 1));
+        var widget = new Widget(1L, 1, 1, 1, 1, 1);
         var expectedRepresentation = 32;
         // Act
         var hashValue = widget.hashCode();
@@ -19,7 +19,7 @@ public class WidgetTest {
     }
     @Test
     public void testGetHashCodePutInSetNotChangeFields_expectContainsTrue() {
-        var widget = new Widget(1L, new WidgetInfo(1, 1, 1, 1, 1));
+        var widget = new Widget(1L,1, 1, 1, 1, 1);
         var anyHashSet = new HashSet<Widget>();
         anyHashSet.add(widget);
         // Act
@@ -30,10 +30,10 @@ public class WidgetTest {
 
     @Test
     public void testGetHashCodePutInSetAndSetAnotherCoordinate_expectContainsTrue() {
-        var widget = new Widget(1L, new WidgetInfo(1, 1, 1, 1, 1));
+        var widget = new Widget(1L, 1, 1, 1, 1, 1);
         var anyHashSet = new HashSet<Widget>();
         anyHashSet.add(widget);
-        widget.setInfo(new WidgetInfo(2, 2, 2, 2, 2));
+        widget.setInfo(2, 2, 2, 2, 2);
         // Act
         var containsResult = anyHashSet.contains(widget);
         // Assert
@@ -43,10 +43,10 @@ public class WidgetTest {
     @DataProvider(name="equals-provider")
     public Object[][] dataProviderMethod() {
         return new Object[][]{
-            { new Widget(1L, new WidgetInfo(1, 1, 1, 1, 1)), null, false},
-            { new Widget(1L, new WidgetInfo(1, 1, 1, 1, 1)), new Widget(2L, new WidgetInfo(1, 1, 1, 1, 1)), false},
-            { new Widget(1L, new WidgetInfo(1, 1, 1, 1, 1)), new Widget(1L, new WidgetInfo(1, 1, 1, 1, 1)), true},
-            { new Widget(1L, new WidgetInfo(1, 1, 1, 1, 1)), new Widget(1L, new WidgetInfo(2, 2, 2, 2, 2)), true},
+            { new Widget(1L, 1, 1, 1, 1, 1), null, false},
+            { new Widget(1L, 1, 1, 1, 1, 1), new Widget(2L, 1, 1, 1, 1, 1), false},
+            { new Widget(1L, 1, 1, 1, 1, 1), new Widget(1L, 1, 1, 1, 1, 1), true},
+            { new Widget(1L, 1, 1, 1, 1, 1), new Widget(1L, 2, 2, 2, 2, 2), true},
         };
     }
 

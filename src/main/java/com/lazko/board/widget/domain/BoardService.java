@@ -26,8 +26,7 @@ public class BoardService {
             var isEmptyZ = widgetRepository.isEmptyZIndex(z);
             if (!isEmptyZ)
                 shiftTail(z);
-            var info = new WidgetInfo(x, y, z, width, height);
-            var widget = new Widget(id, info);
+            var widget = new Widget(id, x, y, z, width, height);
             widgetRepository.save(widget);
             return widget;
         } finally {
@@ -49,8 +48,8 @@ public class BoardService {
                 if (!isEmptyZ)
                     shiftTail(z);
             }
-            var info = new WidgetInfo(x, y, z, width, height);
-            widget.setInfo(info);
+
+            widget.setInfo(x, y, z, width, height);
             widgetRepository.save(widget);
             return widget;
         } finally {
@@ -90,8 +89,7 @@ public class BoardService {
         Integer shiftedZ = z;
         for (var widget: widgets){
             shiftedZ += 1;
-            var info = widget.getInfo().setZ(shiftedZ);
-            widget.setInfo(info);
+            widget.setZ(shiftedZ);
         }
         widgetRepository.saveAll(widgets);
     }

@@ -3,7 +3,6 @@ package com.lazko.board.widget.application;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lazko.board.widget.application.controller.InWidgetDTO;
 import com.lazko.board.widget.domain.Widget;
-import com.lazko.board.widget.domain.WidgetInfo;
 import com.lazko.board.widget.domain.WidgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -79,7 +78,7 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
     @Test
     public void testCreateWidgetWithOccupiedZCoordinate_expectCreatedWidgetWithThisZ() throws Exception {
         var id = widgetRepository.generateId();
-        var existingWidget = new Widget(id, new WidgetInfo(0, 0, 1, 10, 10));
+        var existingWidget = new Widget(id, 0, 0, 1, 10, 10);
         widgetRepository.save(existingWidget);
 
         var newWidgetDTO = new InWidgetDTO(1, 1, 1, 10, 10);
@@ -141,7 +140,7 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
     @Test
     public void testUpdateWidgetWithAllNewValues_expectOkAllActualizedFields() throws Exception {
         var id = widgetRepository.generateId();
-        var existingWidget = new Widget(id, new WidgetInfo(0, 0, 0, 1, 1));
+        var existingWidget = new Widget(id, 0, 0, 0, 1, 1);
         widgetRepository.save(existingWidget);
 
         var updatingWidgetDTO = new InWidgetDTO(5, 5, 5, 10, 10);
@@ -164,7 +163,7 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
     @Test
     public void testUpdateWidgetWithUndefinedZCoordinate_expectOkAllActualizedFields() throws Exception {
         var id = widgetRepository.generateId();
-        var existingWidget = new Widget(id, new WidgetInfo(0, 0, 0, 1, 1));
+        var existingWidget = new Widget(id, 0, 0, 0, 1, 1);
         widgetRepository.save(existingWidget);
 
         var updatingWidgetDTO = new InWidgetDTO(5, 5, null, 10, 10);
@@ -188,7 +187,7 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
     public void testUpdateWidgetWithBusyZCoordinate_expectOkShiftedTail() throws Exception {
         for (var i = 1; i <= 5; i++) {
             var id = widgetRepository.generateId();
-            var widget = new Widget(id, new WidgetInfo(0, 0, i, 1, 1));
+            var widget = new Widget(id, 0, 0, i, 1, 1);
             widgetRepository.save(widget);
         }
         var widget2 = widgetRepository.getById(2L);
@@ -214,14 +213,14 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
             var widget = widgetRepository.getById(id);
             zValues.add(widget.getZ());
         }
-        var expectedZValues = List.of(1,3,4,5, 6);
+        var expectedZValues = List.of(1, 3, 4, 5, 6);
         Assert.assertEquals(zValues, expectedZValues);
     }
 
     @Test
     public void testDeleteExistingWidget_expectNoContent() throws Exception {
         var id = widgetRepository.generateId();
-        var existingWidget = new Widget(id, new WidgetInfo(0, 0, 0, 1, 1));
+        var existingWidget = new Widget(id, 0, 0, 0, 1, 1);
         widgetRepository.save(existingWidget);
 
         // Act
@@ -246,7 +245,7 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
     @Test
     public void testGetExistingWidget_expectOkWithAllFields() throws Exception {
         var id = widgetRepository.generateId();
-        var existingWidget = new Widget(id, new WidgetInfo(0, 0, 0, 10, 10));
+        var existingWidget = new Widget(id, 0, 0, 0, 10, 10);
         widgetRepository.save(existingWidget);
 
         // Act
@@ -281,7 +280,7 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
     public void testGetListWidgetsWithoutQueryParams_expectOkListOfWidgetsWithDefault10Elements() throws Exception {
         for (var i = 0; i < 20; i++) {
             var id = widgetRepository.generateId();
-            Widget widget = new Widget(id, new WidgetInfo(0, 0, i, 10, 10));
+            Widget widget = new Widget(id, 0, 0, i, 10, 10);
             widgetRepository.save(widget);
         }
 
@@ -303,7 +302,7 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
     public void testGetListWidgetsWithQueryParams_expectOkListOfWidgetsWith2Elements() throws Exception {
         for (var i = 0; i < 20; i++) {
             var id = widgetRepository.generateId();
-            Widget widget = new Widget(id, new WidgetInfo(0, 0, i, 10, 10));
+            Widget widget = new Widget(id, 0, 0, i, 10, 10);
             widgetRepository.save(widget);
         }
         // Act

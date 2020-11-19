@@ -8,10 +8,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -77,21 +74,23 @@ public class InMemoryWidgetRepository implements WidgetRepository {
     }
 
     @Override
-    public void save(Widget widget) {
-        widgetCollection.put(widget.getId(), widget);
-        zIndexMap.put(widget.getInfo().z, widget.getId());
+    public Widget save(Widget entity) {
+        widgetCollection.put(entity.getId(), entity);
+        zIndexMap.put(entity.getZ(), entity.getId());
+        return entity;
     }
 
     @Override
     public void deleteById(Long id) throws NotFoundEntityException {
         var widget = getById(id);
-        zIndexMap.remove(widget.getInfo().z);
+        zIndexMap.remove(widget.getZ());
         widgetCollection.remove(id);
     }
 
     @Override
-    public void saveAll(List<Widget> widgets) {
-        for (var widget: widgets)
+    public Iterable<Widget> saveAll(List<Widget> entities) {
+        for (var widget: entities)
             save(widget);
+        return entities;
     }
 }

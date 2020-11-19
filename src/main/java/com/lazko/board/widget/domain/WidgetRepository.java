@@ -14,7 +14,7 @@ public interface WidgetRepository {
     List<Widget> getTailZ(Integer z);
     Page<Widget> findAll(Pageable pageable);
     Widget getById(Long id) throws NotFoundEntityException;
-    void save(Widget widget);
-    void saveAll(List<Widget> widgets);
+    Widget save(Widget entity);
+    Iterable<Widget> saveAll(List<Widget> entities);
     void deleteById(Long id) throws NotFoundEntityException;
 }
