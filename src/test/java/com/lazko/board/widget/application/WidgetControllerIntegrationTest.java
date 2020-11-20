@@ -333,12 +333,16 @@ public class WidgetControllerIntegrationTest extends AbstractTestNGSpringContext
 
     @Test
     public void testGetListWidgetsWithQueryArea_expectOkListOfWidgetsWith2Elements() throws Exception {
+        var widget0 = new Widget(widgetRepository.generateId(), -50, 100, 0, 100, 100);
+        widgetRepository.save(widget0);
         var widget1 = new Widget(widgetRepository.generateId(), 0, 100, 1, 100, 100);
         widgetRepository.save(widget1);
         var widget2 = new Widget(widgetRepository.generateId(), 0, 150, 2, 100, 100);
         widgetRepository.save(widget2);
         var widget3 = new Widget(widgetRepository.generateId(), 50, 150, 3, 100, 100);
-        widgetRepository.save(widget2);
+        widgetRepository.save(widget3);
+        var widget4 = new Widget(widgetRepository.generateId(), 150, 150, 4, 100, 100);
+        widgetRepository.save(widget4);
         // Act
         var response = mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT_URI + "?x=0&y=150&width=100&height=150"));
         // Assert
